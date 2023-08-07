@@ -2,3 +2,5 @@
 data/
 ltl2ba
 __pycache__/
+backlog/
+src/__pycache__/

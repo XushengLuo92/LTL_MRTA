@@ -1,74 +1,159 @@
-from task import Task
-from restricted_buchi_parse import Buchi
-from datetime import datetime
-import restricted_poset
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 from workspace_case1 import Workspace
-
+import itertools
+import networkx as nx
+import pickle
+from task import Task
+from buchi_parse import Buchi
+from datetime import datetime
+import poset
+# from workspace import Workspace
+# from workspace_dars import Workspace
 import matplotlib.pyplot as plt
-import restricted_weighted_ts
-import restricted_weighted_ts_suffix
-import restricted_milp
-import restricted_milp_suf
+import weighted_ts
+import weighted_ts_suffix
+import milp
+import milp_suf
 import pickle
 from vis import plot_workspace
 import numpy
-from post_processing import run
 # from MAPP_heuristic import mapp
-from restricted_GMAPP import mapp, compute_path_cost, return_to_initial
+from GMAPP import mapp, compute_path_cost, return_to_initial
 from vis import vis
 import sys
 from termcolor import colored, cprint
-import networkx as nx
 from sympy.logic.boolalg import to_dnf
 import numpy as np
 
+
+workspace = Workspace()
+with open('data/workspace', 'wb') as filehandle:
+    pickle.dump(workspace, filehandle)
+
+# with open('data/workspace', 'rb') as filehandle:
+#     workspace = pickle.load(filehandle)
+
+# ------------------------- task 1 ----------------------------
+# robot_type1 = [0, 0]
+# target = [0, 0]
+# cost = [100, 100]
+# for pair in itertools.combinations([(1, 0), (1, 1), (1, 2)], 2):
+#     cost_cand = [100, 100]
+#     target_cand = [0, 0]
+#     for i, robot in enumerate(pair):
+#         for cell in workspace.regions['l2']:
+#             length1, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+#                                                              source=workspace.type_robot_location[robot],
+#                                                              target=cell)
+#             length2, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+#                                                              source=cell,
+#                                                              target=(2, 3))
+#
+#             length3, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+#                                                               source=cell,
+#                                                               target=(2, 4))
+#             length2 = min(length2, length3)
+#
+#             if length1 + length2 < cost_cand[i]:
+#                 cost_cand[i] = length1 + length2
+#                 target_cand[i] = cell
+#     # print(pair, cost_cand, target_cand)
+#     if sum(cost_cand) < sum(cost):
+#         cost = cost_cand
+#         target = target_cand
+#         robot_type1 = pair
+#
+# robot_type2 = 0
+# cost2 = 100
+# for robot in [(2, 0), (2, 1)]:
+#     length, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+#                                                       source=workspace.type_robot_location[robot],
+#                                                       target=(1, 6))
+#     if length < cost2:
+#         cost2 = length
+#         robot_type2 = robot
+#
+# assign = {robot: target[i] for i, robot in enumerate(robot_type1)}
+# assign.update({robot_type2: (1, 6)})
+#
+# # print(assign, sum(cost)+cost2)
+# print(sum(cost)+cost2, end=' ')
+
+# ------------------------ task 2 -------------------------------
+
+robot_type1 = [0]
+target = [0]
+cost = [100]
+for pair in itertools.combinations([(1, 0), (1, 1), (1, 2)], 1):
+    cost_cand = [100]
+    target_cand = [0]
+    for i, robot in enumerate(pair):
+        for cell in workspace.regions['l2']:
+            length1, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+                                                             source=workspace.type_robot_location[robot],
+                                                             target=cell)
+            length2, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+                                                                         source=cell,
+                                                                         target=(2, 3))
+
+            length3, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
+                                                                          source=cell,
+                                                                          target=(2, 4))
+            length2 = min(length2, length3)
+
+            if length1 + length2*2 < cost_cand[i]:
+                cost_cand[i] = length1 + length2*2
+                target_cand[i] = cell
+    # print(pair, cost_cand, target_cand)
+    if sum(cost_cand) < sum(cost):
+        cost = cost_cand
+        target = target_cand
+        robot_type1 = pair
+
+assign = {robot: target[i] for i, robot in enumerate(robot_type1)}
+
+# print(assign, sum(cost))
+print(sum(cost), end=' ')
+
+
+# ---------------------------- LTL-MRTA---------------------------
+
 print_red_on_cyan = lambda x: cprint(x, 'blue', 'on_red')
 
+# workspace = Workspace()
+# with open('data/workspace', 'wb') as filehandle:
+#     pickle.dump(workspace, filehandle)
 
-def ltl_mrta():
+type_robot_location = workspace.type_robot_location.copy()
+# return to initial locations or not
 
-    workspace = Workspace()
-    with open('data/workspace', 'wb') as filehandle:
-        pickle.dump(workspace, filehandle)
+start = datetime.now()
+# --------------- constructing the Buchi automaton ----------------
+task = Task()
+buchi = Buchi(task, workspace)
 
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # plot_workspace(workspace, ax)
-    # plt.show()
+buchi.construct_buchi_graph()
+# print('partial time: {0}'.format((datetime.now() - start).total_seconds()))
 
-    # with open('data/workspace', 'rb') as filehandle:
-    #     workspace = pickle.load(filehandle)
-    type_robot_location = workspace.type_robot_location.copy()
-    # return to initial locations or not
-    loop = True
-    one_time = False
-    draw = False
-    show = True
-    show_success = True
-    best_cost = np.inf
-    cost = []
-    time_record = []
-    horizon_record = []
-    number_of_paths = 10
+loop = True
+one_time = True
+draw = True
+show = True
+collision = {'simultaneous': True, 'sequential': False}
+
+init_acpt = buchi.get_init_accept()
+
+for seqsim in ['sequential', 'simultaneous']:
+    best_cost = []
     best_path = dict()
 
-    start = datetime.now()
-    # --------------- constructing the Buchi automaton ----------------
-    task = Task()
-    buchi = Buchi(task, workspace)
-
-    buchi.construct_buchi_graph()
-    if show:
-        print('partial time to build buchi: {0}'.format((datetime.now() - start).total_seconds()))
-
-    init_acpt = buchi.get_init_accept()
-
     for pair, _ in init_acpt:
-
-        # workspace.type_robot_location = type_robot_location.copy()
-        # workspace.update_after_prefix()
-        # buchi.atomic_prop = workspace.atomic_prop
-        # buchi.regions = workspace.regions
+        workspace.type_robot_location = type_robot_location.copy()
+        workspace.update_after_prefix()
+        buchi.atomic_prop = workspace.atomic_prop
+        buchi.regions = workspace.regions
 
         init_state, accept_state = pair[0], pair[1]
 
@@ -98,9 +183,9 @@ def ltl_mrta():
             buchi.atomic_prop = workspace.atomic_prop
             buchi.regions = workspace.regions
 
-            robot2eccl = restricted_poset.element2robot2eccl(pos, element2edge, pruned_subgraph)
-            if show:
-                print('partial time to poset: {0}'.format((datetime.now() - start).total_seconds()))
+            robot2eccl = poset.element2robot2eccl(pos, element2edge, pruned_subgraph)
+
+            # print('partial time to poset: {0}'.format((datetime.now() - start).total_seconds()))
 
             if show:
                 for order in poset_relation:
@@ -109,21 +194,21 @@ def ltl_mrta():
                 print('----------------------------------------------')
 
             incomparable_element, larger_element, smaller_element, strict_larger_element = \
-                restricted_poset.incomparable_larger(pos, poset_relation, hasse_diagram)
+                poset.incomparable_larger(pos, poset_relation, hasse_diagram)
 
             # --------------- construct the routing graph ---------------
             init_type_robot_node, element_component_clause_literal_node, node_location_type_component_element, \
-            num_nodes = restricted_weighted_ts.construct_node_set(pos, element2edge, pruned_subgraph,
+            num_nodes = weighted_ts.construct_node_set(pos, element2edge, pruned_subgraph,
                                                                   workspace.type_robot_label)
 
-            edge_set = restricted_weighted_ts.construct_edge_set(pos, element_component_clause_literal_node,
+            edge_set = weighted_ts.construct_edge_set(pos, element_component_clause_literal_node,
                                                                  element2edge, pruned_subgraph,
                                                                  element_component2label,
                                                                  init_type_robot_node, incomparable_element,
                                                                  strict_larger_element,
                                                                  larger_element, buchi.imply)
 
-            ts = restricted_weighted_ts.construct_graph(num_nodes, node_location_type_component_element, edge_set,
+            ts = weighted_ts.construct_graph(num_nodes, node_location_type_component_element, edge_set,
                                                         workspace.p2p)
 
             if show:
@@ -134,7 +219,7 @@ def ltl_mrta():
 
             robot_waypoint_pre, robot_time_pre, id2robots, robot_label_pre, \
             robot_waypoint_axis, robot_time_axis, time_axis, acpt_run, \
-                = restricted_milp.construct_milp_constraint(ts, workspace.type_num, pos,
+                = milp.construct_milp_constraint(ts, workspace.type_num, pos,
                                                             pruned_subgraph,
                                                             element2edge,
                                                             element_component_clause_literal_node,
@@ -183,7 +268,7 @@ def ltl_mrta():
 
             # --------------------- GMRPP -------------------------
             robot_path_pre = mapp(workspace, buchi, acpt_run, robot_waypoint_axis, robot_time_axis,
-                                  'simultaneous', show)
+                                  seqsim, show, collision[seqsim])
 
             # vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
             #     [])
@@ -201,29 +286,23 @@ def ltl_mrta():
             if buchi.ap_sat_label(pruned_subgraph.nodes[accept_state]['label'],
                                   pruned_subgraph.nodes[accept_state]['neg_label']):
                 end = datetime.now()
-                if show:
-                    print('total time for the prefix parts: {0}'.format((end - start).total_seconds()))
-                cost_pre = compute_path_cost(robot_path_pre)
-                cost.append(cost_pre)
-                time_record.append((end - start).total_seconds())
-                horizon_record.append(len(robot_path_pre[(1, 0)]))
-                if best_cost >= cost_pre:
+                # print('total time for the prefix parts: {0}'.format((end - start).total_seconds()))
+                cost = compute_path_cost(robot_path_pre)
+                best_cost.append(cost)
+                if min(best_cost) >= cost:
                     best_path = robot_path_pre
-                    best_cost = cost_pre
-                print('the total cost of the found path is: ', best_cost, cost, time_record, horizon_record)
-                if show_success:
+                print(min(best_cost), len(robot_path_pre[(1, 0)]), end=' ')
+                # print('the total cost of the found path is: ', min(best_cost), best_cost)
+                if show:
                     print_red_on_cyan(task.formula)
                     print_red_on_cyan([init_state, accept_state, buchi.size,
-                                       [buchi.buchi_graph.number_of_nodes(), buchi.buchi_graph.number_of_edges()],
                                        [pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
-                                  'A path is found for the case where the accepting state has a self-loop'])
+                                      'A path is found for the case where the accepting state has a self-loop'])
                 if draw:
                     vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
                         [])
                 if one_time:
-                    return
-                elif len(cost) > number_of_paths:
-                    return
+                    exit()
                 else:
                     continue
 
@@ -235,7 +314,8 @@ def ltl_mrta():
 
             # ----------------- infer the poset -----------------------
 
-            pruned_subgraph_suf, unpruned_subgraph_suf, paths_suf = buchi.get_subgraph(accept_state, accept_state,
+            pruned_subgraph_suf, unpruned_subgraph_suf, paths_suf = buchi.get_subgraph(accept_state,
+                                                                                       accept_state,
                                                                                        'suffix', last_subtask)
             # no suffix graph due to that final locations of prefix part do not satisfy the outgoing edges
             # of the accepting vertex
@@ -261,10 +341,11 @@ def ltl_mrta():
                               pruned_subgraph_suf.edges[element2edge_suf[order_suf[1]]]['formula'])
                     print('----------------------------------------------')
 
-                robot2eccl_suf = restricted_poset.element2robot2eccl(pos_suf, element2edge_suf, pruned_subgraph_suf)
+                robot2eccl_suf = poset.element2robot2eccl(pos_suf, element2edge_suf,
+                                                                     pruned_subgraph_suf)
 
                 incomparable_element_suf, larger_element_suf, smaller_element_suf, strict_larger_element_suf = \
-                    restricted_poset.incomparable_larger(pos_suf, poset_relation_suf, hasse_diagram_suf)
+                    poset.incomparable_larger(pos_suf, poset_relation_suf, hasse_diagram_suf)
 
                 # --------------- construct the routing graph ---------------
                 minimal_element_suf = [node for node in hasse_diagram_suf.nodes()
@@ -272,13 +353,15 @@ def ltl_mrta():
                 init_type_robot_node_suf, element_component_clause_literal_node_suf, \
                 node_location_type_component_element_suf, \
                 num_nodes_suf, final_element_type_robot_node \
-                    = restricted_weighted_ts_suffix.construct_node_set(pos_suf, element2edge_suf, pruned_subgraph_suf,
+                    = weighted_ts_suffix.construct_node_set(pos_suf, element2edge_suf,
+                                                                       pruned_subgraph_suf,
                                                                        workspace.type_robot_label,
                                                                        minimal_element_suf, last_subtask, loop)
 
-                edge_set_suf = restricted_weighted_ts_suffix.construct_edge_set(pos_suf,
+                edge_set_suf = weighted_ts_suffix.construct_edge_set(pos_suf,
                                                                                 element_component_clause_literal_node_suf,
-                                                                                element2edge_suf, pruned_subgraph_suf,
+                                                                                element2edge_suf,
+                                                                                pruned_subgraph_suf,
                                                                                 element_component2label_suf,
                                                                                 init_type_robot_node_suf,
                                                                                 incomparable_element_suf,
@@ -288,7 +371,7 @@ def ltl_mrta():
                                                                                 minimal_element_suf,
                                                                                 final_element_type_robot_node)
 
-                ts_suf = restricted_weighted_ts_suffix.construct_graph(num_nodes_suf,
+                ts_suf = weighted_ts_suffix.construct_graph(num_nodes_suf,
                                                                        node_location_type_component_element_suf,
                                                                        edge_set_suf,
                                                                        workspace.p2p)
@@ -299,17 +382,22 @@ def ltl_mrta():
 
                 robot_waypoint_suf, robot_time_suf, _, robot_label_suf, robot_waypoint_axis_suf, robot_time_axis_suf, \
                 time_axis_suf, acpt_run_suf \
-                    = restricted_milp_suf.construct_milp_constraint(ts_suf, workspace.type_num, pos_suf,
+                    = milp_suf.construct_milp_constraint(ts_suf, workspace.type_num, pos_suf,
                                                                     pruned_subgraph_suf,
                                                                     element2edge_suf,
                                                                     element_component_clause_literal_node_suf,
-                                                                    poset_relation_suf, init_type_robot_node_suf,
-                                                                    strict_larger_element_suf, incomparable_element_suf,
+                                                                    poset_relation_suf,
+                                                                    init_type_robot_node_suf,
+                                                                    strict_larger_element_suf,
+                                                                    incomparable_element_suf,
                                                                     larger_element_suf,
-                                                                    robot2eccl_suf, id2robots, accept_state, buchi,
-                                                                    minimal_element_suf, final_element_type_robot_node,
+                                                                    robot2eccl_suf, id2robots, accept_state,
+                                                                    buchi,
+                                                                    minimal_element_suf,
+                                                                    final_element_type_robot_node,
                                                                     workspace.type_robot_label,
-                                                                    maximal_element_suf, last_subtask, show, loop)
+                                                                    maximal_element_suf, last_subtask, show,
+                                                                    loop)
                 if not robot_waypoint_suf:
                     continue
 
@@ -349,8 +437,9 @@ def ltl_mrta():
 
                 # return to initial locations
                 if not loop:
-                    horizon = workspace.longest_time({robot: path[-1] for robot, path in robot_path_suf.items()},
-                                                     workspace.type_robot_location)
+                    horizon = workspace.longest_time(
+                        {robot: path[-1] for robot, path in robot_path_suf.items()},
+                        workspace.type_robot_location)
 
                     acpt_run_suf = {'subtask': 'return',
                                     'time_element': [horizon, -1],
@@ -369,37 +458,29 @@ def ltl_mrta():
                     for robot, path in robot_path_suf.items():
                         path += robot_path_return[robot][1:]
 
+                end = datetime.now()
+                # print('total time for the prefix + suffix parts: {0}'.format((end - start).total_seconds()))
+
                 robot_path = {robot: path + robot_path_suf[robot][1:] + robot_path_suf[robot][1:] for
                               robot, path in robot_path_pre.items()}
 
-                cost_pre = compute_path_cost(robot_path_pre)
-                cos_suf = compute_path_cost(robot_path_suf)
-                end = datetime.now()
-                if show:
-                    print('total time for the prefix + suffix parts: {0}'.format((end - start).total_seconds()))
-
-                cost.append((cost_pre, cos_suf))
-                time_record.append((end-start).total_seconds())
-                horizon_record.append((len(robot_path_pre[(1, 0)]), len(robot_path_suf[(1, 0)])))
-                if best_cost >= cost_pre + cos_suf:
+                cost = compute_path_cost({robot: path + robot_path_suf[robot][1:]
+                                          for robot, path in robot_path_pre.items()})
+                best_cost.append(cost)
+                if min(best_cost) >= cost:
                     best_path = robot_path
-                    best_cost = cost_pre + cos_suf
-                print('the total cost of the found path is: ', best_cost, cost, time_record, horizon_record)
-                if show_success:
+                print(min(best_cost), len(robot_path_pre[(1, 0)])+len(robot_path_suf[(1, 0)]), end=' ')
+                # print('the total cost of the found path is: ', min(best_cost), best_cost)
+                if show:
                     print_red_on_cyan(task.formula)
                     print_red_on_cyan([init_state, accept_state, buchi.size,
-                                       [buchi.buchi_graph.number_of_nodes(), buchi.buchi_graph.number_of_edges()],
-                                   ([pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
-                                    [pruned_subgraph_suf.number_of_nodes(), pruned_subgraph_suf.number_of_edges()]),
-                                   'A path is found for the case where the accepting state does not have a self-loop'])
+                                       ([pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
+                                        [pruned_subgraph_suf.number_of_nodes(),
+                                         pruned_subgraph_suf.number_of_edges()]),
+                                       'A path is found for the case where the accepting state does not have a self-loop'])
                 if draw:
-                    vis(workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()}, [])
+                    vis(workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()},
+                        [])
                 if one_time:
-                    return
-                if len(cost) > number_of_paths:
-                    return
-    return cost
-
-
-if __name__ == '__main__':
-    ltl_mrta()
+                    exit()
+print('')

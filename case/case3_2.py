@@ -1,20 +1,22 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 from task import Task
-from restricted_buchi_parse import Buchi
+from buchi_parse import Buchi
 from datetime import datetime
-import restricted_poset
+import poset
 from workspace_case3 import Workspace
 
 import matplotlib.pyplot as plt
-import restricted_weighted_ts
-import restricted_weighted_ts_suffix
-import restricted_milp
-import restricted_milp_suf
+import weighted_ts
+import weighted_ts_suffix
+import milp
+import milp_suf
 import pickle
 from vis import plot_workspace
 import numpy
-from post_processing import run
 # from MAPP_heuristic import mapp
-from restricted_GMAPP import mapp, compute_path_cost, return_to_initial
+from src.GMAPP import mapp, compute_path_cost, return_to_initial
 from vis import vis
 import sys
 from termcolor import colored, cprint
@@ -114,7 +116,7 @@ def ltl_mrta(formula):
             buchi.atomic_prop = workspace.atomic_prop
             buchi.regions = workspace.regions
 
-            robot2eccl = restricted_poset.element2robot2eccl(pos, element2edge, pruned_subgraph)
+            robot2eccl = poset.element2robot2eccl(pos, element2edge, pruned_subgraph)
             if show:
                 print('partial time to poset: {0}'.format((datetime.now() - start).total_seconds()))
 
@@ -124,21 +126,21 @@ def ltl_mrta(formula):
                           pruned_subgraph.edges[element2edge[order[1]]]['formula'])
                 print('----------------------------------------------')
             incomparable_element, larger_element, smaller_element, strict_larger_element = \
-                restricted_poset.incomparable_larger(pos, poset_relation, hasse_diagram)
+                poset.incomparable_larger(pos, poset_relation, hasse_diagram)
 
             # --------------- construct the routing graph ---------------
             init_type_robot_node, element_component_clause_literal_node, node_location_type_component_element, \
-            num_nodes = restricted_weighted_ts.construct_node_set(pos, element2edge, pruned_subgraph,
+            num_nodes = weighted_ts.construct_node_set(pos, element2edge, pruned_subgraph,
                                                                   workspace.type_robot_label)
 
-            edge_set = restricted_weighted_ts.construct_edge_set(pos, element_component_clause_literal_node,
+            edge_set = weighted_ts.construct_edge_set(pos, element_component_clause_literal_node,
                                                                  element2edge, pruned_subgraph,
                                                                  element_component2label,
                                                                  init_type_robot_node, incomparable_element,
                                                                  strict_larger_element,
                                                                  larger_element, buchi.imply)
 
-            ts = restricted_weighted_ts.construct_graph(num_nodes, node_location_type_component_element, edge_set,
+            ts = weighted_ts.construct_graph(num_nodes, node_location_type_component_element, edge_set,
                                                         workspace.p2p)
 
             if show:
@@ -149,7 +151,7 @@ def ltl_mrta(formula):
 
             robot_waypoint_pre, robot_time_pre, id2robots, robot_label_pre, \
             robot_waypoint_axis, robot_time_axis, time_axis, acpt_run, \
-                = restricted_milp.construct_milp_constraint(ts, workspace.type_num, pos,
+                = milp.construct_milp_constraint(ts, workspace.type_num, pos,
                                                             pruned_subgraph,
                                                             element2edge,
                                                             element_component_clause_literal_node,
@@ -290,10 +292,10 @@ def ltl_mrta(formula):
                               pruned_subgraph_suf.edges[element2edge_suf[order_suf[1]]]['formula'])
                     print('----------------------------------------------')
 
-                robot2eccl_suf = restricted_poset.element2robot2eccl(pos_suf, element2edge_suf, pruned_subgraph_suf)
+                robot2eccl_suf = poset.element2robot2eccl(pos_suf, element2edge_suf, pruned_subgraph_suf)
 
                 incomparable_element_suf, larger_element_suf, smaller_element_suf, strict_larger_element_suf = \
-                    restricted_poset.incomparable_larger(pos_suf, poset_relation_suf, hasse_diagram_suf)
+                    poset.incomparable_larger(pos_suf, poset_relation_suf, hasse_diagram_suf)
 
                 # --------------- construct the routing graph ---------------
                 minimal_element_suf = [node for node in hasse_diagram_suf.nodes()
@@ -301,11 +303,11 @@ def ltl_mrta(formula):
                 init_type_robot_node_suf, element_component_clause_literal_node_suf, \
                 node_location_type_component_element_suf, \
                 num_nodes_suf, final_element_type_robot_node \
-                    = restricted_weighted_ts_suffix.construct_node_set(pos_suf, element2edge_suf, pruned_subgraph_suf,
+                    = weighted_ts_suffix.construct_node_set(pos_suf, element2edge_suf, pruned_subgraph_suf,
                                                                        workspace.type_robot_label,
                                                                        minimal_element_suf, last_subtask, loop)
 
-                edge_set_suf = restricted_weighted_ts_suffix.construct_edge_set(pos_suf,
+                edge_set_suf = weighted_ts_suffix.construct_edge_set(pos_suf,
                                                                                 element_component_clause_literal_node_suf,
                                                                                 element2edge_suf, pruned_subgraph_suf,
                                                                                 element_component2label_suf,
@@ -317,7 +319,7 @@ def ltl_mrta(formula):
                                                                                 minimal_element_suf,
                                                                                 final_element_type_robot_node)
 
-                ts_suf = restricted_weighted_ts_suffix.construct_graph(num_nodes_suf,
+                ts_suf = weighted_ts_suffix.construct_graph(num_nodes_suf,
                                                                        node_location_type_component_element_suf,
                                                                        edge_set_suf,
                                                                        workspace.p2p)
@@ -328,7 +330,7 @@ def ltl_mrta(formula):
 
                 robot_waypoint_suf, robot_time_suf, _, robot_label_suf, robot_waypoint_axis_suf, robot_time_axis_suf, \
                 time_axis_suf, acpt_run_suf \
-                    = restricted_milp_suf.construct_milp_constraint(ts_suf, workspace.type_num, pos_suf,
+                    = milp_suf.construct_milp_constraint(ts_suf, workspace.type_num, pos_suf,
                                                                     pruned_subgraph_suf,
                                                                     element2edge_suf,
                                                                     element_component_clause_literal_node_suf,

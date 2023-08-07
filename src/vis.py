@@ -69,20 +69,20 @@ class RobotPath:
 
 
 def plot_workspace(workspace, ax):
-    plt.rc('text', usetex=True)
+    plt.rc('text', usetex=False)
     ax.set_xlim((0, workspace.width))
     ax.set_ylim((0, workspace.length))
     plt.xticks(np.arange(0, workspace.width + 1, 1.0))
     plt.yticks(np.arange(0, workspace.length + 1, 1.0))
     plot_workspace_helper(ax, workspace.regions, 'region')
     plot_workspace_helper(ax, workspace.obstacles, 'obstacle')
-    plt.grid(b=True, which='major', color='gray', linestyle='--')
+    plt.grid(which='major', color='gray', linestyle='--')
 
     # plt.title(r'$\phi_3$')
 
 
 def plot_workspace_helper(ax, obj, obj_label):
-    plt.rc('text', usetex=True)
+    plt.rc('text', usetex=False)
     plt.rc('font', family='serif')
     plt.gca().set_aspect('equal', adjustable='box')
     for key in obj:
@@ -164,6 +164,6 @@ def vis(workspace, robot_path, robot_pre_suf_time, ap):
                                                   ap_template, ap_text],
                              frames=int(np.ceil(max_frame)), interval=30, blit=True)
     # ani.save('/Users/chrislaw/Box Sync/Research/LTL_MRTA_icra2020/video/phi.mp4', fps=1/cls_robot_path.dt, dpi=400)
-    ani.save('/Users/chrislaw/Desktop/mapp.mp4', fps=2/cls_robot_path.dt, dpi=400)
+    ani.save('./data/mapp.mp4', fps=2/cls_robot_path.dt, dpi=400)
 
-    plt.show()
+    # plt.show()

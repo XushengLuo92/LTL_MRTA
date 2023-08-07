@@ -1,37 +1,16 @@
-y#!/bin/bash
-
-#for w in 50
-#do
-#    echo "---------------------------w=${w}-------------------------"
-#    for n in  12
-#    do
-#        echo "--------------------n=${n}-----------------------"
-#        fc
-#        do
-#            /usr/local/Cellar/python/3.6.3/Frameworks/Python.framework/Versions/3.6/bin/python3.6 /Users/chrislaw/Github/LTL_MRTA_plus/stap.py ${w} ${n}
-#        done
-#    done
-#    # for ((n=3;n<4;n++))
-#done
-#     echo "---------------------------n=${n}-------------------------"
-#     for h in 10 15 20
-#     do
-#         echo "---------------------h=${h}-----------------------------"
-#         /usr/local/Cellar/python3/3.6.3/Frameworks/Python.framework/Versions/3.6/bin/python3.6 /Users/chrislaw/GitHub/RRT*_LTL/SMT4MulR_2.py ${h}
-#     done
-# done
+#!/bin/bash
 
 # ------------------------- case 1 ------------------------
 #for ((n=1;n<50;n++))
 #do
-#    /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8    /Users/chrislaw/Github/LTL_MRTA_optimal/case1.py 'f'
+#    /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8    ./case/case1.py 'f'
 #done
 
 # -------------------------- case 2 ------------------------
 #for ((n=1;n<21;n++))
 #do
 #    echo "---------------------------n=${n}-------------------------"
-#    /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8 /Users/chrislaw/Github/LTL_MRTA_optimal/case2.py 'f'
+#    /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8 ./case/case2.py 'f'
 #done
 # -------------------------- case 3 ------------------------
  for N in 32
@@ -44,7 +23,7 @@ y#!/bin/bash
          for m in 'f'
          do
              echo "---------------------------m=${m}-------------------------"
-             /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8  /Users/chrislaw/Github/LTL_MRTA_optimal/case3_2.py ${m} ${N}
+             /usr/local/Cellar/python@3.8/3.8.6_2/Frameworks/Python.framework/Versions/3.8/bin/python3.8  ./case/case3_2.py ${m} ${N}
          done
      done
  done
