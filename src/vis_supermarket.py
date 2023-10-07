@@ -3,6 +3,8 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import numpy as np
 import matplotlib.animation as anim
+import matplotlib.patches as mpatches
+
 
 
 class RobotPath:
@@ -12,7 +14,7 @@ class RobotPath:
         self.i_x = np.asarray(x, dtype=float)
         self.color = np.asarray(color, dtype=float)
         self.x = self.i_x.copy()
-        self.elapse_time = -2
+        self.elapse_time = -4  # adjust this number to display time recorder from 0s
         self.dt = 1
         self.workspace = workspace
         self.ap = ap
@@ -69,26 +71,38 @@ class RobotPath:
 
 
 def plot_workspace(workspace, ax):
-    plt.rc('text', usetex=True)
+    plt.rc('text', usetex=False)
     ax.set_xlim((0, workspace.width))
     ax.set_ylim((0, workspace.length))
-    plt.xticks(np.arange(0, workspace.width + 1, 1.0))
-    plt.yticks(np.arange(0, workspace.length + 1, 1.0))
+    plt.xticks(np.arange(0, workspace.width + 1, 5))
+    plt.yticks(np.arange(0, workspace.length + 1, 5))
     plot_workspace_helper(ax, workspace.regions, 'region')
     plot_workspace_helper(ax, workspace.obstacles, 'obstacle')
-    plt.grid(which='major', color='gray', linestyle='--')
+    # plt.grid(visible=True, which='major', color='gray', linestyle='--')
 
     # plt.title(r'$\phi_3$')
 
 
 def plot_workspace_helper(ax, obj, obj_label):
-    plt.rc('text', usetex=True)
+    plt.rc('text', usetex=False)
     plt.rc('font', family='serif')
     plt.gca().set_aspect('equal', adjustable='box')
+    # p0 dock
+    # p1 grocery p2 health p3 outdors p4 pet p5 furniture p6 electronics 
+    # p7 packing area
+    region = {'p0': 'dock',
+              'p1': 'grocery',
+              'p2': 'health',
+              'p3': 'outdoors',
+              'p4': 'pet supplies',
+              'p5': 'furniture',
+              'p6': 'electronics',
+              'p7': 'packing area'}
     for key in obj:
         if 'r' in key:
             continue
-        color = 'k' if obj_label != 'region' else 'gray'
+        # color = 'gray' if obj_label != 'region' else 'white'
+        color = 'gray' if obj_label != 'region' or (key == 'p0' or key == 'p7') else 'white'
         alpha = 0.9 if obj_label != 'region' else 0.4
         for grid in obj[key]:
             x_ = grid[0]
@@ -103,12 +117,14 @@ def plot_workspace_helper(ax, obj, obj_label):
             patches.append(polygon)
             p = PatchCollection(patches, facecolors=color, edgecolors=color, alpha=alpha)
             ax.add_collection(p)
-        ax.text(np.mean(x) - 0.2, np.mean(y) - 0.2, r'${}_{{{}}}$'.format(key[0], key[1:]), fontsize=12)
+        # ax.text(np.mean(x) - 0.2, np.mean(y) - 0.2, r'${}_{{{}}}$'.format(key[0], key[1:]), fontsize=12)
+        if key == 'p0':
+            ax.text(np.mean(x) + 1, np.mean(y) - 5, r'{}'.format(region[key]), fontsize=6)
+        elif key == 'p7':
+            ax.text(np.mean(x) - 3.5, np.mean(y) + 1, r'{}'.format(region[key]), fontsize=6)
+        elif 'o' in key:
+            ax.text(np.mean(x) - 2, np.mean(y) + 1, r'{}'.format(region['p' + key[1:]]), fontsize=6)
 
-            # r = r'$[] <> (\pi_{2,1}^{\ell_1,1} \wedge  \pi_{2,4}^{\ell_4,1})  \wedge ' \
-    #     '<> \pi_{1,1}^{\ell_2,0}  \wedge  ' \
-    #     '[] <> \pi_{2,1}^{\ell_3,1} \wedge []  <> (\pi_{2,2}^{\ell_2,0} \vee' \
-    #     '\pi_{2,2}^{\ell_3,0}$'
 
 
 def animate(i, ax, particles, annots, cls_robot_path, time_template, time_text, ap_template, ap_text):
@@ -133,12 +149,12 @@ def animate(i, ax, particles, annots, cls_robot_path, time_template, time_text, 
 
 def vis(workspace, robot_path, robot_pre_suf_time, ap):
     num_type = len(workspace.type_num.keys())
-    color = np.linspace(0.9, 0.1, num_type)
+    colors_type = np.linspace(0.9, 0.1, num_type)
     # color = [0.4, 0.6]
     x = list((value[0]+0.5, value[1]+0.5) for value in workspace.type_robot_location.values())
-    color = [color[i[0]-1] for i in robot_path.keys()]
+    colors = [colors_type[i[0]-1] for i in robot_path.keys()]
 
-    cls_robot_path = RobotPath(x, color, robot_path, robot_pre_suf_time, workspace, ap)
+    cls_robot_path = RobotPath(x, colors, robot_path, robot_pre_suf_time, workspace, ap)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -146,14 +162,19 @@ def vis(workspace, robot_path, robot_pre_suf_time, ap):
     plot_workspace(workspace, ax)
 
     time_template = 'time = %.1fs'
-    time_text = ax.text(0.01, 1.05, time_template % cls_robot_path.elapse_time, transform=ax.transAxes, weight='bold')
+    time_text = ax.text(0.01, 1.05, time_template % cls_robot_path.elapse_time, transform=ax.transAxes)
 
     ap_template = '{0} {1} {2}'
-    ap_text = [ax.text(-3.5, 9.5 - k*0.5, ap_template.format('{0}'.format("."), '{0}'.format("."), '{0}'.format(".")),
-                       color='red', weight='bold') for k in range(10)]
+    # ap_text = [ax.text(-3.5, 9.5 - k*0.5, ap_template.format('{0}'.format("."), '{0}'.format("."), '{0}'.format(".")),
+    #                    color='red', weight='bold') for k in range(10)]
+    ap_text = []
     cls_robot_path.label(workspace.type_robot_location)
-
-    particles = ax.scatter([], [], c=[], s=70, cmap="hsv", vmin=0, vmax=1)
+    groups = ["type1", "type2", "type3"]
+    particles = ax.scatter([], [], c=[], s=30, cmap="hsv", vmin=0, vmax=1)
+    # Create a legend patch for each group
+    legend_patches = [mpatches.Patch(color=plt.cm.hsv(color), label=group) for group, color in zip(groups, colors_type)]
+    # Add the legend patches to the plot
+    ax.legend(handles=legend_patches, fontsize=6)
     # annots = [ax.text(100, 100, r"[{0},{1}]".format(type_robot[1]+1, type_robot[0]), weight='bold', fontsize=8)
     #           for type_robot in robot_path.keys()]
     annots = [ax.text(100, 100, r"{0}".format(type_robot[1]+1), weight='bold', fontsize=8)

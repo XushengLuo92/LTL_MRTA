@@ -345,7 +345,7 @@ def mapp(workspace, buchi, acpt_run, robot_waypoint, robot_time, order, show, co
             horizon = next_time - past_time
             robot_init = {robot: path[-1] for robot, path in robot_path.items()}
             freq = 1
-            for T in range(horizon, horizon + 100, 1):
+            for T in range(horizon, horizon + 100, 2):
                 mapp_paths = multi_agent_path_planning(workspace, T, robot_team_initial_target, robot_move, neg_clause,
                                                        robot_init, show, collision_avoidance)
                 if mapp_paths:
