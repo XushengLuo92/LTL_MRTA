@@ -99,7 +99,7 @@ def plot_workspace_helper(ax, obj, obj_label):
             for point in [(x_, y_), (x_ + 1, y_), (x_ + 1, y_ + 1), (x_, y_ + 1)]:
                 x.append(point[0])
                 y.append(point[1])
-            polygon = Polygon(np.column_stack((x, y)), True)
+            polygon = Polygon(np.column_stack((x, y)), closed=True)
             patches.append(polygon)
             p = PatchCollection(patches, facecolors=color, edgecolors=color, alpha=alpha)
             ax.add_collection(p)

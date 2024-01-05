@@ -9,7 +9,6 @@ import re
 import networkx as nx
 import numpy as np
 from networkx.classes.digraph import DiGraph
-import datetime
 from sympy.logic.boolalg import to_dnf, And, Equivalent
 
 

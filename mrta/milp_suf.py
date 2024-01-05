@@ -1,6 +1,5 @@
 from gurobipy import *
-import math
-from post_processing import run
+from .post_processing import run
 from termcolor import colored, cprint
 
 print_red_on_cyan = lambda x: cprint(x, 'blue', 'on_red')
@@ -141,9 +140,9 @@ def construct_milp_constraint(ts, type_num, poset, pruned_subgraph, element2edge
         m.Params.OutputFlag = 0
     m.Params.MIPGap = 0.1
     m.update()
-    # if show:
-    print('# of suf variables: {0}'.format(m.NumVars))
-    print('# of suf constraints: {0}'.format(m.NumConstrs))
+    if show:
+        print('# of suf variables: {0}'.format(m.NumVars))
+        print('# of suf constraints: {0}'.format(m.NumConstrs))
 
     m.optimize()
 

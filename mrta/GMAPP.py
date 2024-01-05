@@ -1,9 +1,9 @@
 import networkx as nx
 from gurobipy import *
-from workspace_dars import Workspace
+from .workspace_dars import Workspace
 import matplotlib.pyplot as plt
 import itertools
-from vis import vis
+from .vis import vis
 import datetime
 import numpy as np
 
@@ -197,7 +197,7 @@ def extract_paths(x_vars, time_expanded_graph, loc2node, robot_index, edge_index
     return paths
 
 
-def mapp(workspace, buchi, acpt_run, robot_waypoint, robot_time, order, show, collision_avoidance=True):
+def mapp(workspace, buchi, acpt_run, robot_waypoint, robot_time, order, show, partial_or_full, collision_avoidance=True):
     """
     Generalized multi-robot path planning
     """
@@ -237,7 +237,6 @@ def mapp(workspace, buchi, acpt_run, robot_waypoint, robot_time, order, show, co
             next_time = acpt_run[clock + 1]['time_element'][0]  # the completion of the current subtask
 
             # robots that need to move according to positive literals
-            partial_or_full = 'f'
             robot_move = set(robot for robot_initial_target in robot_team_initial_target.values()
                              for robot in robot_initial_target.keys())
             if partial_or_full == 'f':
@@ -327,7 +326,6 @@ def mapp(workspace, buchi, acpt_run, robot_waypoint, robot_time, order, show, co
             next_time = acpt_run[clock+1]['time_element'][0]  # the completion of the current subtask
 
             # robots that need to move according to positive literals
-            partial_or_full = sys.argv[1]
             robot_move = set(robot for robot_initial_target in robot_team_initial_target.values()
                              for robot in robot_initial_target.keys())
             remove_edge = update_robot_env(workspace, robot_team_initial_target, robot_move, robot_waypoint, robot_time,

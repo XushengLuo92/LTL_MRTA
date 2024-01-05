@@ -1,152 +1,68 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-from workspace_case1 import Workspace
-import itertools
+from mrta.workspace_case1 import Workspace
 import networkx as nx
 import pickle
-from task import Task
-from buchi_parse import Buchi
+from mrta.task import Task
+from mrta.buchi_parse import Buchi
 from datetime import datetime
-import poset
+from mrta import poset
 # from workspace import Workspace
 # from workspace_dars import Workspace
 import matplotlib.pyplot as plt
-import weighted_ts
-import weighted_ts_suffix
-import milp
-import milp_suf
+from mrta import weighted_ts
+from mrta import weighted_ts_suffix
+from mrta import milp
+from mrta import milp_suf
 import pickle
-from vis import plot_workspace
-import numpy
-# from MAPP_heuristic import mapp
-from GMAPP import mapp, compute_path_cost, return_to_initial
-from vis import vis
-import sys
-from termcolor import colored, cprint
+from mrta.vis import plot_workspace
+from mrta.GMAPP import mapp, compute_path_cost, return_to_initial
+from mrta.vis import vis
 from sympy.logic.boolalg import to_dnf
-import numpy as np
+import os
+from mrta.util import create_parser, print_red_on_cyan
+import numpy as np 
 
+# Define the path for the 'data' folder
+data_folder_path = './data'
 
+# Check if the folder exists
+if not os.path.exists(data_folder_path):
+    # If the folder does not exist, create it
+    os.makedirs(data_folder_path)
+
+# ---------------------------- LTL-MRTA---------------------------
+parser = create_parser()
+args = parser.parse_known_args()[0]
+    
 workspace = Workspace()
-with open('data/workspace', 'wb') as filehandle:
+with open('./data/workspace', 'wb') as filehandle:
     pickle.dump(workspace, filehandle)
 
 # with open('data/workspace', 'rb') as filehandle:
 #     workspace = pickle.load(filehandle)
 
-# ------------------------- task 1 ----------------------------
-# robot_type1 = [0, 0]
-# target = [0, 0]
-# cost = [100, 100]
-# for pair in itertools.combinations([(1, 0), (1, 1), (1, 2)], 2):
-#     cost_cand = [100, 100]
-#     target_cand = [0, 0]
-#     for i, robot in enumerate(pair):
-#         for cell in workspace.regions['l2']:
-#             length1, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-#                                                              source=workspace.type_robot_location[robot],
-#                                                              target=cell)
-#             length2, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-#                                                              source=cell,
-#                                                              target=(2, 3))
-#
-#             length3, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-#                                                               source=cell,
-#                                                               target=(2, 4))
-#             length2 = min(length2, length3)
-#
-#             if length1 + length2 < cost_cand[i]:
-#                 cost_cand[i] = length1 + length2
-#                 target_cand[i] = cell
-#     # print(pair, cost_cand, target_cand)
-#     if sum(cost_cand) < sum(cost):
-#         cost = cost_cand
-#         target = target_cand
-#         robot_type1 = pair
-#
-# robot_type2 = 0
-# cost2 = 100
-# for robot in [(2, 0), (2, 1)]:
-#     length, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-#                                                       source=workspace.type_robot_location[robot],
-#                                                       target=(1, 6))
-#     if length < cost2:
-#         cost2 = length
-#         robot_type2 = robot
-#
-# assign = {robot: target[i] for i, robot in enumerate(robot_type1)}
-# assign.update({robot_type2: (1, 6)})
-#
-# # print(assign, sum(cost)+cost2)
-# print(sum(cost)+cost2, end=' ')
-
-# ------------------------ task 2 -------------------------------
-
-robot_type1 = [0]
-target = [0]
-cost = [100]
-for pair in itertools.combinations([(1, 0), (1, 1), (1, 2)], 1):
-    cost_cand = [100]
-    target_cand = [0]
-    for i, robot in enumerate(pair):
-        for cell in workspace.regions['l2']:
-            length1, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-                                                             source=workspace.type_robot_location[robot],
-                                                             target=cell)
-            length2, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-                                                                         source=cell,
-                                                                         target=(2, 3))
-
-            length3, _ = nx.algorithms.single_source_dijkstra(workspace.graph_workspace,
-                                                                          source=cell,
-                                                                          target=(2, 4))
-            length2 = min(length2, length3)
-
-            if length1 + length2*2 < cost_cand[i]:
-                cost_cand[i] = length1 + length2*2
-                target_cand[i] = cell
-    # print(pair, cost_cand, target_cand)
-    if sum(cost_cand) < sum(cost):
-        cost = cost_cand
-        target = target_cand
-        robot_type1 = pair
-
-assign = {robot: target[i] for i, robot in enumerate(robot_type1)}
-
-# print(assign, sum(cost))
-print(sum(cost), end=' ')
-
-
-# ---------------------------- LTL-MRTA---------------------------
-
-print_red_on_cyan = lambda x: cprint(x, 'blue', 'on_red')
-
-# workspace = Workspace()
-# with open('data/workspace', 'wb') as filehandle:
-#     pickle.dump(workspace, filehandle)
-
-type_robot_location = workspace.type_robot_location.copy()
 # return to initial locations or not
+type_robot_location = workspace.type_robot_location.copy()
 
 start = datetime.now()
 # --------------- constructing the Buchi automaton ----------------
-task = Task()
+task = Task(args.case)
 buchi = Buchi(task, workspace)
 
 buchi.construct_buchi_graph()
 # print('partial time: {0}'.format((datetime.now() - start).total_seconds()))
 
-loop = True
-one_time = True
-draw = True
-show = True
+loop = args.loop
+one_time = args.only_first
+draw = args.vis
+show = args.print
+partial_or_full = args.partial_or_full
+
 collision = {'simultaneous': True, 'sequential': False}
 
 init_acpt = buchi.get_init_accept()
 
 for seqsim in ['sequential', 'simultaneous']:
-    best_cost = []
+    best_cost = np.inf
     best_path = dict()
 
     for pair, _ in init_acpt:
@@ -268,7 +184,7 @@ for seqsim in ['sequential', 'simultaneous']:
 
             # --------------------- GMRPP -------------------------
             robot_path_pre = mapp(workspace, buchi, acpt_run, robot_waypoint_axis, robot_time_axis,
-                                  seqsim, show, collision[seqsim])
+                                  seqsim, show, partial_or_full, collision[seqsim])
 
             # vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
             #     [])
@@ -288,11 +204,10 @@ for seqsim in ['sequential', 'simultaneous']:
                 end = datetime.now()
                 # print('total time for the prefix parts: {0}'.format((end - start).total_seconds()))
                 cost = compute_path_cost(robot_path_pre)
-                best_cost.append(cost)
-                if min(best_cost) >= cost:
+                if best_cost >= cost:
                     best_path = robot_path_pre
-                print(min(best_cost), len(robot_path_pre[(1, 0)]), end=' ')
-                # print('the total cost of the found path is: ', min(best_cost), best_cost)
+                    best_cost = cost
+                    print(f'{seqsim} + col:{collision[seqsim]}: cost of the best pre + suf (loop) parts {best_cost}, horizon {len(best_path[(1, 0)])}')
                 if show:
                     print_red_on_cyan(task.formula)
                     print_red_on_cyan([init_state, accept_state, buchi.size,
@@ -433,7 +348,7 @@ for seqsim in ['sequential', 'simultaneous']:
                     print('----------------------------------------------')
 
                 robot_path_suf = mapp(workspace, buchi, acpt_run_suf, robot_waypoint_axis_suf,
-                                      robot_time_axis_suf, 'simultaneous', show)
+                                      robot_time_axis_suf, 'simultaneous', show, partial_or_full)
 
                 # return to initial locations
                 if not loop:
@@ -466,10 +381,10 @@ for seqsim in ['sequential', 'simultaneous']:
 
                 cost = compute_path_cost({robot: path + robot_path_suf[robot][1:]
                                           for robot, path in robot_path_pre.items()})
-                best_cost.append(cost)
-                if min(best_cost) >= cost:
+                if best_cost >= cost:
                     best_path = robot_path
-                print(min(best_cost), len(robot_path_pre[(1, 0)])+len(robot_path_suf[(1, 0)]), end=' ')
+                    best_cost = cost
+                    print(f'{seqsim} + col:{collision[seqsim]} cost of the best pre + suf parts {min(best_cost)}, horizon {len(robot_path_pre[(1, 0)])+len(robot_path_suf[(1, 0)])}')
                 # print('the total cost of the found path is: ', min(best_cost), best_cost)
                 if show:
                     print_red_on_cyan(task.formula)

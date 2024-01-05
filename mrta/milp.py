@@ -1,6 +1,5 @@
 from gurobipy import *
-import math
-from post_processing import run
+from .post_processing import run
 from termcolor import colored, cprint
 import itertools
 
