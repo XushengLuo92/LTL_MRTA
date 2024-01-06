@@ -1,6 +1,3 @@
-import sys
-
-
 class Task(object):
     def __init__(self, case=None, n_robot=None):
         # l_0_0_0: regions, type, #robots, indicator for same robots

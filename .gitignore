@@ -5,3 +5,4 @@ __pycache__/
 backlog/
 src/__pycache__/
 mrta.egg-info/
+.DS_Store

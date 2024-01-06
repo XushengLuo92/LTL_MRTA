@@ -131,7 +131,7 @@ def animate(i, ax, particles, annots, cls_robot_path, time_template, time_text, 
     return [particles]+annots+[time_text]+ap_text
 
 
-def vis(workspace, robot_path, robot_pre_suf_time, ap):
+def vis(case, workspace, robot_path, robot_pre_suf_time, ap):
     num_type = len(workspace.type_num.keys())
     color = np.linspace(0.9, 0.1, num_type)
     # color = [0.4, 0.6]
@@ -164,6 +164,6 @@ def vis(workspace, robot_path, robot_pre_suf_time, ap):
                                                   ap_template, ap_text],
                              frames=int(np.ceil(max_frame)), interval=30, blit=True)
     # ani.save('/Users/chrislaw/Box Sync/Research/LTL_MRTA_icra2020/video/phi.mp4', fps=1/cls_robot_path.dt, dpi=400)
-    ani.save('./data/mapp.mp4', fps=2/cls_robot_path.dt, dpi=400)
+    ani.save(f'./data/mapp_case{case}.mp4', fps=2/cls_robot_path.dt, dpi=400)
 
     # plt.show()

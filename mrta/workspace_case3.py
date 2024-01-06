@@ -7,7 +7,7 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 import numpy as np
 import random
-import sys
+import os
 import itertools
 import pickle
 import scipy.io as sio
@@ -31,8 +31,8 @@ class Workspace(object):
         self.num_of_regions = 10
         self.num_of_obstacles = 10
         self.occupied = []
-        self.data = sio.loadmat('/Users/chrislaw/Box Sync/Research/2020_LTL_MRTA_IJRR/'
-                                'cLTL-hierarchical-master/examples/env.mat')
+        current_folder = os.getcwd()
+        self.data = sio.loadmat(current_folder + '/case/env.mat')
         self.obstacles = {'o{0}'.format(i + 1): j for i, j in enumerate(self.allocate_obstacle_dars())}
         self.regions = {'l{0}'.format(i + 1): j for i, j in enumerate(self.allocate_region_dars())}
         self.type_robot_location = self.initialize()

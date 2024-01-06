@@ -9,6 +9,7 @@ def create_parser():
     """
     parser = argparse.ArgumentParser(description='LTL_MRTA')
     parser.add_argument('--case', default=0, type=int)
+    parser.add_argument('--robot', default=1, type=int)
     parser.add_argument('--print', action='store_true', help='Enable print to terminal')
     parser.add_argument('--vis', action='store_true', help='Enable visualization')
     parser.add_argument('--only_first', action='store_true', help='Stop upon find the first solution')

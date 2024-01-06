@@ -13,10 +13,8 @@ from mrta import weighted_ts_suffix
 from mrta import milp
 from mrta import milp_suf
 import pickle
-from mrta.vis import plot_workspace
 from mrta.GMAPP import mapp, compute_path_cost, return_to_initial
 from mrta.vis import vis
-from sympy.logic.boolalg import to_dnf
 import os
 from mrta.util import create_parser, print_red_on_cyan
 import numpy as np 
@@ -214,7 +212,7 @@ for seqsim in ['sequential', 'simultaneous']:
                                        [pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
                                       'A path is found for the case where the accepting state has a self-loop'])
                 if draw:
-                    vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
+                    vis(args.case, workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
                         [])
                 if one_time:
                     exit()
@@ -394,7 +392,7 @@ for seqsim in ['sequential', 'simultaneous']:
                                          pruned_subgraph_suf.number_of_edges()]),
                                        'A path is found for the case where the accepting state does not have a self-loop'])
                 if draw:
-                    vis(workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()},
+                    vis(args.case, workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()},
                         [])
                 if one_time:
                     exit()

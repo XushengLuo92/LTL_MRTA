@@ -1,31 +1,31 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-from task import Task
-from buchi_parse import Buchi
+from mrta.task import Task
+from mrta.buchi_parse import Buchi
 from datetime import datetime
-import poset
-from workspace_case1 import Workspace
-
-import matplotlib.pyplot as plt
-import weighted_ts
-import weighted_ts_suffix
-import milp
-import milp_suf
+from mrta import poset
+from mrta.workspace_case1 import Workspace
+from mrta import weighted_ts
+from mrta import weighted_ts_suffix
+from mrta import milp
+from mrta import milp_suf
 import pickle
-from vis import plot_workspace
-import numpy
-# from MAPP_heuristic import mapp
-from src.GMAPP import mapp, compute_path_cost, return_to_initial
-from vis import vis
-import sys
-from termcolor import colored, cprint
+from mrta.GMAPP import mapp, compute_path_cost, return_to_initial
+from mrta.vis import vis
 import networkx as nx
-from sympy.logic.boolalg import to_dnf
+from mrta.util import create_parser, print_red_on_cyan
 import numpy as np
+import os
 
-print_red_on_cyan = lambda x: cprint(x, 'blue', 'on_red')
+# Define the path for the 'data' folder
+data_folder_path = './data'
 
+# Check if the folder exists
+if not os.path.exists(data_folder_path):
+    # If the folder does not exist, create it
+    os.makedirs(data_folder_path)
+
+# ---------------------------- LTL-MRTA---------------------------
+parser = create_parser()
+args = parser.parse_known_args()[0]
 
 def ltl_mrta():
 
@@ -40,12 +40,13 @@ def ltl_mrta():
 
     # with open('data/workspace', 'rb') as filehandle:
     #     workspace = pickle.load(filehandle)
-    type_robot_location = workspace.type_robot_location.copy()
     # return to initial locations or not
-    loop = True
-    one_time = False
-    draw = False
-    show = True
+    type_robot_location = workspace.type_robot_location.copy()
+    loop = args.loop
+    one_time = args.only_first
+    draw = args.vis
+    show = args.print
+    partial_or_full = args.partial_or_full
     show_success = True
     best_cost = np.inf
     cost = []
@@ -56,7 +57,7 @@ def ltl_mrta():
 
     start = datetime.now()
     # --------------- constructing the Buchi automaton ----------------
-    task = Task()
+    task = Task(args.case)
     buchi = Buchi(task, workspace)
 
     buchi.construct_buchi_graph()
@@ -185,7 +186,7 @@ def ltl_mrta():
 
             # --------------------- GMRPP -------------------------
             robot_path_pre = mapp(workspace, buchi, acpt_run, robot_waypoint_axis, robot_time_axis,
-                                  'simultaneous', show)
+                                  'simultaneous', show, partial_or_full)
 
             # vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
             #     [])
@@ -212,7 +213,11 @@ def ltl_mrta():
                 if best_cost >= cost_pre:
                     best_path = robot_path_pre
                     best_cost = cost_pre
-                print('the total cost of the found path is: ', best_cost, cost, time_record, horizon_record)
+                print(f'The total cost of the found path (loop) is: ')
+                print(f'best total cost: {best_cost}')
+                print(f'cost per solution (pre, suf): {cost}')
+                print(f'runtimes up to now {time_record}')
+                print(f'horizon per solution (pre, suf) {horizon_record}')
                 if show_success:
                     print_red_on_cyan(task.formula)
                     print_red_on_cyan([init_state, accept_state, buchi.size,
@@ -220,7 +225,7 @@ def ltl_mrta():
                                        [pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
                                   'A path is found for the case where the accepting state has a self-loop'])
                 if draw:
-                    vis(workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
+                    vis(args.case, workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
                         [])
                 if one_time:
                     return
@@ -347,7 +352,7 @@ def ltl_mrta():
                     print('----------------------------------------------')
 
                 robot_path_suf = mapp(workspace, buchi, acpt_run_suf, robot_waypoint_axis_suf,
-                                      robot_time_axis_suf, 'simultaneous', show)
+                                      robot_time_axis_suf, 'simultaneous', show, partial_or_full)
 
                 # return to initial locations
                 if not loop:
@@ -386,7 +391,11 @@ def ltl_mrta():
                 if best_cost >= cost_pre + cos_suf:
                     best_path = robot_path
                     best_cost = cost_pre + cos_suf
-                print('the total cost of the found path is: ', best_cost, cost, time_record, horizon_record)
+                print(f'The total cost of the found path (loop) is: ')
+                print(f'best total cost: {best_cost}')
+                print(f'cost per solution (pre, suf): {cost}')
+                print(f'runtimes up to now {time_record}')
+                print(f'horizon per solution (pre, suf) {horizon_record}')
                 if show_success:
                     print_red_on_cyan(task.formula)
                     print_red_on_cyan([init_state, accept_state, buchi.size,
@@ -395,7 +404,7 @@ def ltl_mrta():
                                     [pruned_subgraph_suf.number_of_nodes(), pruned_subgraph_suf.number_of_edges()]),
                                    'A path is found for the case where the accepting state does not have a self-loop'])
                 if draw:
-                    vis(workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()}, [])
+                    vis(args.case, workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()}, [])
                 if one_time:
                     return
                 if len(cost) > number_of_paths:
