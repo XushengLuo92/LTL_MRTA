@@ -26,6 +26,7 @@ $$
 \phi_2 &= \square \lozenge \left(\pi_{1,1}^{2,1} \wedge \lozenge \pi_{1,1}^{3,1}\right)
 \end{align}
 $$
+
 where the atomic proposition $\pi_{i, j}^k$ is true if there exist at least $i$ robots of type $j$ at region $\ell_k$ at the same time. APs with identical second superscripts should be satisfied by same robots. For instance, $\pi_{2,1}^{2,1}$ and $\pi_{2,1}^{3,1}$ require that the same set of 2 robots of type 1 visit regions $\ell_2$ and $\ell_3$, respectively.
 ```bash
 # change c to 1, 2
