@@ -32,6 +32,8 @@ where the atomic proposition $\pi_{i, j}^k$ is true if there exist at least $i$ 
 # change c to 1, 2
 python ./case/case1.py --case=c --partial_or_full=f --only_first --loop --vis --print
 ```
+The explanation of arguments can be found in function [create_parser](mrta/util.py).
+
 <video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/e59550d1-07da-469c-ad23-99d5d901f628" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
 </video>
 The demo video for case 1.
