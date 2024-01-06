@@ -58,7 +58,7 @@ def ltl_mrta():
     best_path = dict()
 
     # --------------- constructing the Buchi automaton ----------------
-    task = Task(args.robot)
+    task = Task(args.case, args.robot)
     buchi = Buchi(task, workspace)
 
     buchi.construct_buchi_graph()
