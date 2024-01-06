@@ -31,11 +31,8 @@ $$
 # change c to 1, 2
 python ./case/case1.py --case=c --partial_or_full=f --only_first --loop --vis --print
 ```
-<video width="320" height="240" controls>
-  <source src="./data/mapp_case1.mp4" type="video/mp4">
-  Your browser does not support the video tag.
+<video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/e59550d1-07da-469c-ad23-99d5d901f628" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
 </video>
-
 The demo video for case 1.
 
 ### Simulation II
@@ -53,12 +50,8 @@ $$
 # change c to 3, 4, ... 8
 python ./case/case2.py --case=c --partial_or_full=f --only_first --loop --vis --print
 ```
-
-<video width="320" height="240" controls>
-  <source src="./data/mapp_case5.mp4" type="video/mp4">
-  Your browser does not support the video tag.
+<video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/26ffb258-fbfe-4068-8f02-5945a6d91f05" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
 </video>
-
 The demo video for case 5.
 
 
@@ -73,9 +66,7 @@ $$
 # change c to 9, 10
 python ./case/case3.py --case=c --partial_or_full=f --only_first --loop --vis --print --robot=2 
 ```
-<video width="320" height="240" controls>
-  <source src="./data/mapp_case9.mp4" type="video/mp4">
-  Your browser does not support the video tag.
+<video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/2fd62cb9-0e03-4cc3-8c7c-b0a2d0c6fab7" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
 </video>
 
 The demo video for case 9.
