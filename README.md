@@ -22,7 +22,7 @@ Download the software `LTL2BA` from this [link](http://www.lsv.fr/~gastin/ltl2ba
 ### Simulation I
 $$
 \begin{align}
-\phi_1 &= \lozenge \left(\left(\pi_{2,1}^{2,1}\wedge \neg \pi_{2,1}^{3}\right) \wedge  \lozenge \pi_{2,1}^{3,1}\right)  \wedge \lozenge \pi_{1,2}^{4} \wedge \neg \pi_{2,1}^{3} \,U\, \pi_{1,2}^{4} \\
+\phi_1 &= \lozenge \left(\left(\pi_{2,1}^{2,1}\wedge \neg \pi_{2,1}^{3}\right) \wedge  \lozenge \pi_{2,1}^{3,1}\right)  \wedge \lozenge \pi_{1,2}^{4} \wedge \neg \pi_{2,1}^{3} \ U\  \pi_{1,2}^{4} \\
 \phi_2 &= \square \lozenge \left(\pi_{1,1}^{2,1} \wedge \lozenge \pi_{1,1}^{3,1}\right)
 \end{align}
 $$
@@ -41,12 +41,12 @@ The demo video for case 1.
 ### Simulation II
 $$
 \begin{align}
-   \phi_3 &= \, \square \lozenge (\pi_{2,1}^{2,1} \wedge \lozenge (\pi_{2,1}^{3,1} \wedge \lozenge (\pi_{2,1}^{4,1} \wedge \lozenge \pi_{2,1}{5,1}  )   )  ), \\
-   \phi_4 & = \square \lozenge (\pi_{2,1}^{2,1} \wedge \lozenge \pi_{2,1}^{3,1}) \wedge \square (\pi_{1,1}^{5,2} \Rightarrow \bigcirc (\pi_{1,1}^{5,2} \;U \, \pi_{1,2}^{4})) \wedge \square \neg \pi_{2,1}^{4},\\
-   \phi_5  & = \, \lozenge (\pi_{1,2}^{4,1} \wedge \bigcirc (\pi_{1,2}^{4,1} \;U \, \pi_{2,1}^{3})) \wedge \square \lozenge ( \pi_{1,2}^{4,1} \wedge \lozenge \pi_{1,2}^{3,1}), \\
-   \phi_6  & = \,  \square \lozenge (\pi_{1,1}^{3,1} \,\vee \, \pi_{1,1}^{5,1}) \wedge \square \lozenge \pi_{1,1}^{2,1}  \wedge \square \lozenge (\pi_{2,2}^{3} \,\vee\, \pi_{2,2}^{5}) \wedge \square \neg \pi_{2,1}^{4} \wedge \square \neg \pi_{2,2}^{4}, \\
-   \phi_7  & = \,  \square \lozenge (\pi_{1,2}^{4} \wedge \bigcirc (\lozenge \neg \pi_{1,2}^{4})) \wedge  \square \lozenge (\pi_{1,1}^{5} \wedge \bigcirc (\lozenge \neg \pi_{1,1}^{5} )) \wedge  \lozenge  (\pi_{3,1}^{3} \wedge \pi_{2,2}^{3}), \\
-   \phi_8 & = \, \square \lozenge  (\pi_{2,2}^{4,1} \wedge \lozenge (\pi_{2,2}^{2,1} \wedge \lozenge \pi_{2,2}^{5,1}))  \wedge  \neg \pi_{1,2}^{2} \;U \, \pi_{2,2}^{4,1} \wedge \neg \pi_{1,2}^{5} \; U \, \pi_{2,2}^{4,1} \wedge (\square \lozenge \pi_{2,1}^{5}\, \vee \,  \square \lozenge \pi_{2,1}^{3}),
+   \phi_3 &= \  \square \lozenge (\pi_{2,1}^{2,1} \wedge \lozenge (\pi_{2,1}^{3,1} \wedge \lozenge (\pi_{2,1}^{4,1} \wedge \lozenge \pi_{2,1}{5,1}  )   )  ), \\
+   \phi_4 & = \square \lozenge (\pi_{2,1}^{2,1} \wedge \lozenge \pi_{2,1}^{3,1}) \wedge \square (\pi_{1,1}^{5,2} \Rightarrow \bigcirc (\pi_{1,1}^{5,2} \;U \  \pi_{1,2}^{4})) \wedge \square \neg \pi_{2,1}^{4},\\
+   \phi_5  & = \  \lozenge (\pi_{1,2}^{4,1} \wedge \bigcirc (\pi_{1,2}^{4,1} \;U \  \pi_{2,1}^{3})) \wedge \square \lozenge ( \pi_{1,2}^{4,1} \wedge \lozenge \pi_{1,2}^{3,1}), \\
+   \phi_6  & = \   \square \lozenge (\pi_{1,1}^{3,1} \ \vee \  \pi_{1,1}^{5,1}) \wedge \square \lozenge \pi_{1,1}^{2,1}  \wedge \square \lozenge (\pi_{2,2}^{3} \ \vee\  \pi_{2,2}^{5}) \wedge \square \neg \pi_{2,1}^{4} \wedge \square \neg \pi_{2,2}^{4}, \\
+   \phi_7  & = \   \square \lozenge (\pi_{1,2}^{4} \wedge \bigcirc (\lozenge \neg \pi_{1,2}^{4})) \wedge  \square \lozenge (\pi_{1,1}^{5} \wedge \bigcirc (\lozenge \neg \pi_{1,1}^{5} )) \wedge  \lozenge  (\pi_{3,1}^{3} \wedge \pi_{2,2}^{3}), \\
+   \phi_8 & = \  \square \lozenge  (\pi_{2,2}^{4,1} \wedge \lozenge (\pi_{2,2}^{2,1} \wedge \lozenge \pi_{2,2}^{5,1}))  \wedge  \neg \pi_{1,2}^{2} \;U \  \pi_{2,2}^{4,1} \wedge \neg \pi_{1,2}^{5} \; U \  \pi_{2,2}^{4,1} \wedge (\square \lozenge \pi_{2,1}^{5}\  \vee \   \square \lozenge \pi_{2,1}^{3}),
  \end{align}
 $$
 ```bash
@@ -65,8 +65,8 @@ The demo video for case 5.
 ### Simulation III
 $$
 \begin{align}
-     \phi_9 & = \,  \square \lozenge \pi_{n,1}^{2} \wedge   \square \lozenge \pi_{n/2,1}^{3} \,\wedge \square \lozenge \pi_{n/2,1}^{4} \wedge \neg \pi_{1,1}^{4} \,U\, (\pi_{1,1}^{5} \wedge \pi_{1,1}^{6}), \\
-    \phi_{10} & = \, \lozenge (\pi_{3,1}^{5} \,\vee \, \pi_{3,1}^{6}) \,\wedge   \square \lozenge (\pi_{n/2,1}^{2,1} \wedge \lozenge \pi_{n/2,1}^{4,1}) \wedge  \square \lozenge \pi_{n/4,1}^{3} \wedge \square \neg \pi_{4,1}^{6},
+     \phi_9 & = \   \square \lozenge \pi_{n,1}^{2} \wedge   \square \lozenge \pi_{n/2,1}^{3} \ \wedge \square \lozenge \pi_{n/2,1}^{4} \wedge \neg \pi_{1,1}^{4} \ U\  (\pi_{1,1}^{5} \wedge \pi_{1,1}^{6}), \\
+    \phi_{10} & = \  \lozenge (\pi_{3,1}^{5} \ \vee \  \pi_{3,1}^{6}) \ \wedge   \square \lozenge (\pi_{n/2,1}^{2,1} \wedge \lozenge \pi_{n/2,1}^{4,1}) \wedge  \square \lozenge \pi_{n/4,1}^{3} \wedge \square \neg \pi_{4,1}^{6},
 \end{align}
 $$
 ```bash
