@@ -34,7 +34,7 @@ python ./case/case1.py --case=c --partial_or_full=f --only_first --loop --vis --
 ```
 The explanation of arguments can be found in function [create_parser](mrta/util.py).
 
-<video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/e59550d1-07da-469c-ad23-99d5d901f628" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
+<video src="https://github.com/XushengLuo92/LTL_MRTA/assets/26454312/4f85302f-4238-4816-a204-7116bed584e8" controls="controls" style="max-width: 730px; width: 100%; height: auto;">
 </video>
 The demo video for case 1.
 
