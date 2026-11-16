@@ -1,182 +1,150 @@
 window.DEMOS = [
   {
     "id": 1,
-    "title": "Release a restriction before a paired visit",
-    "description": "A Type 1 pair visits L2, then L3. A Type 2 arrival at L4 releases the temporary L3 restriction.",
-    "note": "The actual planner run releases the restriction at step 5, witnesses the paired L2 visit at step 10, and completes the paired L3 visit at step 22.",
+    "title": "Mail delivery with a release condition",
+    "description": "Two Type 1 robots collect mail together at office L2 and deliver it together to L3. A Type 2 robot visits control room L4 to enable the disinfection process before the pair reaches L3.",
     "obligations": [
-      "The same two Type 1 robots must visit L2 and then L3 together.",
-      "Before release, L3 can contain at most one Type 1 robot.",
-      "The release persists after the Type 2 robot leaves L4."
+      "Use the same Type 1 pair for collection and delivery.",
+      "Until Type 2 reaches L4, at most one Type 1 robot may occupy L3. That arrival releases the restriction.",
+      "At the paired L2 visit, fewer than two Type 1 robots may be at L3."
     ],
     "robots": 5,
     "label": "Case 1",
-    "meta": "Simulation I · 5 robots · seed 42",
     "video": "demo/generated/case_01.mp4",
-    "replay": "demo/generated/case_01.json",
-    "validation": "demo/generated/case_01.validation.json",
-    "poster": "site/posters/case_01.jpg"
+    "poster": "site/posters/case_01.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=5"
   },
   {
     "id": 2,
-    "title": "Repeated visits by the same robot",
-    "description": "One selected Type 1 robot visits L2 and then L3, repeatedly.",
-    "note": "The video shows the initial prefix and two executions of the closed cycle. The recurrence check evaluates infinite repetition of that cycle.",
+    "title": "Repeated equipment transport",
+    "description": "One Type 1 robot repeatedly transports equipment between office L2 and delivery site L3. The paper assumes the disinfection process operates automatically for this task.",
     "obligations": [
-      "Preserve the selected robot identity across visits.",
-      "Visit L2 before the subsequent L3 visit.",
-      "Repeat the ordered visits indefinitely."
+      "The same robot must visit L2 and then L3.",
+      "Continue making these ordered visits indefinitely. A single round trip is not enough."
     ],
     "robots": 5,
     "label": "Case 2",
-    "meta": "Simulation I · 5 robots · seed 42",
     "video": "demo/generated/case_02.mp4",
-    "replay": "demo/generated/case_02.json",
-    "validation": "demo/generated/case_02.validation.json",
-    "poster": "site/posters/case_02.jpg"
+    "poster": "site/posters/case_02.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=5"
   },
   {
     "id": 3,
-    "title": "A recurring four-region tour",
-    "description": "The same Type 1 pair follows an ordered tour through four task regions.",
-    "note": "Task cards connect each stage of the selected accepting run to the assigned pair’s positions.",
+    "title": "A shared four-region patrol",
+    "description": "A pair of Type 1 robots makes a recurring tour through L2, L3, L4, and L5, meeting at each region in that order.",
     "obligations": [
-      "Visit L2 → L3 → L4 → L5 in order.",
-      "The same two Type 1 robots occupy each region together.",
-      "Repeat the tour on a closed cycle."
+      "Keep the same two robots throughout the tour.",
+      "Both robots must be in each required region at the same time.",
+      "Repeat the complete ordered tour indefinitely."
     ],
     "robots": 5,
     "label": "Case 3",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_03.mp4",
-    "replay": "demo/generated/case_03.json",
-    "validation": "demo/generated/case_03.validation.json",
-    "poster": "site/posters/case_03.jpg"
+    "poster": "site/posters/case_03.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 4,
-    "title": "Conditional holding and permanent avoidance",
-    "description": "A Type 1 pair repeatedly visits L2 and L3, alongside a conditional holding rule and an occupancy limit.",
-    "note": "The L5 trigger is unused in this solution. Its unused identity is recorded as a validation witness, not an optimizer assignment.",
+    "title": "Repeated delivery with conditional waiting",
+    "description": "A Type 1 pair repeatedly visits L2 and then L3. A separately identified Type 1 robot has a waiting obligation whenever it visits L5.",
     "obligations": [
-      "Repeat the same pair’s L2 → L3 visits.",
-      "If the separately identified Type 1 robot enters L5, hold it there from the next step until Type 2 reaches L4.",
-      "Keep at most one Type 1 robot in L4 at all times."
+      "The same pair must meet at L2 and then L3 on repeated trips.",
+      "After the designated robot visits L5, it must stay there from the next step until a Type 2 robot reaches L4.",
+      "L4 may contain at most one Type 1 robot at any time."
     ],
     "robots": 5,
     "label": "Case 4",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_04.mp4",
-    "replay": "demo/generated/case_04.json",
-    "validation": "demo/generated/case_04.validation.json",
-    "poster": "site/posters/case_04.jpg"
+    "poster": "site/posters/case_04.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 5,
-    "title": "Hold until another team arrives",
-    "description": "A selected Type 2 robot waits at L4 for a Type 1 pair to reach L3.",
-    "note": "The holding condition ties one robot’s permission to leave to another team’s arrival.",
+    "title": "Wait for another team to arrive",
+    "description": "A Type 2 robot visits L4 and waits for two Type 1 robots to meet at L3. The same Type 2 robot also makes recurring trips from L4 to L3.",
     "obligations": [
-      "Reach L4 and, from the next step, hold until two Type 1 robots occupy L3.",
-      "The selected Type 2 robot also repeatedly visits L4 and then L3.",
-      "Track the same Type 2 identity across these obligations."
+      "From the step after the required L4 visit, keep that robot at L4 until the Type 1 pair meets at L3.",
+      "Use the same Type 2 robot for the repeated L4 → L3 visits."
     ],
     "robots": 5,
     "label": "Case 5",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_05.mp4",
-    "replay": "demo/generated/case_05.json",
-    "validation": "demo/generated/case_05.validation.json",
-    "poster": "site/posters/case_05.jpg"
+    "poster": "site/posters/case_05.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 6,
-    "title": "Alternative destinations, limited occupancy",
-    "description": "Robots can satisfy recurring visits at either L3 or L5 while obeying permanent L4 limits.",
-    "note": "The selected accepting run shows which alternative destination is used at each recorded task event.",
+    "title": "Recurring visits with a choice of destination",
+    "description": "One Type 1 robot repeatedly visits L2 and also repeatedly visits either L3 or L5. Two Type 2 robots repeatedly meet at either L3 or L5.",
     "obligations": [
-      "A selected Type 1 robot repeatedly visits L3 or L5, and repeatedly visits L2.",
-      "Two Type 2 robots repeatedly visit L3 or L5 together.",
-      "Allow at most one robot of each type in L4."
+      "Use the same Type 1 robot for its L2 visits and its L3-or-L5 visits.",
+      "The Type 2 visits require two robots to occupy the chosen region together.",
+      "At L4, allow at most one Type 1 robot and at most one Type 2 robot."
     ],
     "robots": 5,
     "label": "Case 6",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_06.mp4",
-    "replay": "demo/generated/case_06.json",
-    "validation": "demo/generated/case_06.validation.json",
-    "poster": "site/posters/case_06.jpg"
+    "poster": "site/posters/case_06.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 7,
-    "title": "Arrival, departure, and a rendezvous",
-    "description": "Repeated visits must include departures, and all five robots must meet together once.",
-    "note": "Remaining inside a region cannot satisfy an arrival-and-departure obligation.",
+    "title": "Repeated departures and a team rendezvous",
+    "description": "Type 2 robots repeatedly visit and leave L4, while Type 1 robots repeatedly visit and leave L5. All five robots must also gather at L3 at least once.",
     "obligations": [
-      "Type 2 repeatedly visits L4, followed by a step with no Type 2 robot there.",
-      "Type 1 has the analogous arrival-and-departure rule at L5.",
-      "All three Type 1 and both Type 2 robots meet at L3 at least once."
+      "Each required Type 2 visit to L4 must eventually be followed by a step with no Type 2 robot there.",
+      "Apply the same arrival-and-departure rule to Type 1 at L5.",
+      "The rendezvous needs three Type 1 and two Type 2 robots in L3 simultaneously."
     ],
     "robots": 5,
     "label": "Case 7",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_07.mp4",
-    "replay": "demo/generated/case_07.json",
-    "validation": "demo/generated/case_07.validation.json",
-    "poster": "site/posters/case_07.jpg"
+    "poster": "site/posters/case_07.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 8,
-    "title": "Unlock two regions before a tour",
-    "description": "A joint Type 2 arrival at L4 unlocks L2 and L5 for a recurring tour.",
-    "note": "Watch the restriction hatching disappear when the Type 2 pair reaches L4.",
+    "title": "Unlock regions before a recurring tour",
+    "description": "A Type 2 pair repeatedly tours L4 → L2 → L5. Its first meeting at L4 unlocks L2 and L5 for Type 2 robots.",
     "obligations": [
-      "No Type 2 robot enters L2 or L5 until the selected Type 2 pair first reaches L4.",
-      "The same Type 2 pair repeatedly visits L4 → L2 → L5.",
-      "Two Type 1 robots repeatedly visit L5 together, or repeatedly visit L3 together."
+      "Until that first joint L4 visit, no Type 2 robot may enter L2 or L5.",
+      "Use the same Type 2 pair for the recurring ordered tour.",
+      "Also require repeated two-robot Type 1 meetings at L5, or repeated two-robot Type 1 meetings at L3."
     ],
     "robots": 5,
     "label": "Case 8",
-    "meta": "Simulation II · 5 robots · seed 42",
     "video": "demo/generated/case_08.mp4",
-    "replay": "demo/generated/case_08.json",
-    "validation": "demo/generated/case_08.validation.json",
-    "poster": "site/posters/case_08.jpg"
+    "poster": "site/posters/case_08.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=18"
   },
   {
     "id": 9,
-    "title": "Twelve-robot recurring visits",
-    "description": "A larger team coordinates full-team and six-robot visits, with a temporary restriction on L4.",
-    "note": "Release occurs at step 18; all 12 robots reach L2 at step 41. The six-robot visits to L3 and L4 are witnessed at step 67. The cycle spans steps 67–105.",
+    "title": "Full-team and half-team rendezvous",
+    "description": "All 12 robots repeatedly meet at L2. Groups of at least six also repeatedly meet at L3 and at L4, subject to an initial restriction on L4.",
     "obligations": [
-      "All 12 robots repeatedly occupy L2 together.",
-      "At least six robots repeatedly visit L3, and at least six repeatedly visit L4.",
-      "Keep L4 empty until L5 and L6 are simultaneously occupied."
+      "Keep L4 empty until L5 and L6 each contain at least one robot at the same time.",
+      "After release, continue the full-team L2 visits and the six-robot L3 and L4 visits indefinitely.",
+      "The six-robot groups do not have to preserve fixed robot identities."
     ],
     "robots": 12,
     "label": "Case 9",
-    "meta": "Simulation III · 12 robots · seed 42",
     "video": "demo/generated/case_09.mp4",
-    "replay": "demo/generated/case_09.json",
-    "validation": "demo/generated/case_09.validation.json",
-    "poster": "site/posters/case_09.jpg"
+    "poster": "site/posters/case_09.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=19"
   },
   {
     "id": 10,
-    "title": "Twelve-robot identity and safety",
-    "description": "A fixed six-robot team repeats an ordered visit while smaller groups satisfy other obligations.",
-    "note": "The closed cycle spans steps 36–90. The permanent L6 occupancy limit is never released.",
+    "title": "A fixed team with a permanent occupancy limit",
+    "description": "The same six robots repeatedly meet at L2 and then L4. At least three robots repeatedly meet at L3, and at least three must meet at L5 or L6 once.",
     "obligations": [
-      "The same six robots repeatedly visit L2 and then L4 together.",
-      "At least three robots repeatedly visit L3; three visit L5 or L6 together at least once.",
-      "At most three robots may occupy L6 at any step."
+      "Preserve the six robot identities across the L2 → L4 visits.",
+      "The recurring L3 meetings need at least three robots together.",
+      "Never allow more than three robots in L6. This restriction is permanent."
     ],
     "robots": 12,
     "label": "Case 10",
-    "meta": "Simulation III · 12 robots · seed 42",
     "video": "demo/generated/case_10.mp4",
-    "replay": "demo/generated/case_10.json",
-    "validation": "demo/generated/case_10.validation.json",
-    "poster": "site/posters/case_10.jpg"
+    "poster": "site/posters/case_10.jpg",
+    "paper": "https://arxiv.org/pdf/2101.05694.pdf#page=20"
   }
 ];
