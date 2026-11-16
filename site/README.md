@@ -4,7 +4,7 @@ Live site: https://xushengluo92.github.io/LTL_MRTA/
 
 GitHub Pages serves the repository root from `codex/demo-visual-refresh`. `.nojekyll` keeps it a plain static site. Push changes to that branch to publish.
 
-- `index.html`: layout, introduction, setup, and first-demo fallback.
+- `index.html`: layout, introduction, and first-demo fallback.
 - `site/demos.js`: selectable demo descriptions and media paths.
 - `site/app.js`: accessible demo selection and query-string links (`?demo=2`).
 - `site/style.css`: responsive layout.
