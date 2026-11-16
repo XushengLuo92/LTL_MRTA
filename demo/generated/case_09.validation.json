@@ -1,0 +1,12 @@
+{
+  "motion_valid": true,
+  "violations": [],
+  "ltl_satisfied_on_repeating_cycle": true,
+  "loop_start": 67,
+  "loop_end": 105,
+  "loop_closed": true,
+  "horizon": 143,
+  "robot_count": 12,
+  "witness_bindings": {},
+  "bindings_inferred_for_validation_only": []
+}

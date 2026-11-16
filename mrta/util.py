@@ -8,6 +8,9 @@ def create_parser():
         _type_: _description_
     """
     parser = argparse.ArgumentParser(description='LTL_MRTA')
+    parser.add_argument('--seed', type=int, help='Seed for reproducible initial positions.')
+    parser.add_argument('--output-dir', default='data', help='Destination for planner replays and videos.')
+    parser.add_argument('--replay-only', action='store_true', help='Save trajectories and mission metadata without rendering a video.')
     parser.add_argument('--case', default=0, type=int)
     parser.add_argument('--robot', default=1, type=int)
     parser.add_argument('--print', action='store_true', help='Enable print to terminal')
