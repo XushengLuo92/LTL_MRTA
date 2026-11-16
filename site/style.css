@@ -6,3 +6,9 @@
 .hero-title {display:block;padding:42px 0 28px}
 .hero-title h1 {max-width:1150px;margin:0 0 22px;font-size:clamp(30px,3.7vw,52px);line-height:1.14;letter-spacing:-.035em}
 .hero-title .lead {max-width:850px}
+
+.workspace-maps {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.workspace-maps figure {margin:0}
+.workspace-maps h3 {margin:16px 0 6px;font-size:18px;font-weight:600}
+.workspace-maps p {margin:0;font-size:14px;color:var(--muted)}
+@media(max-width:720px){.workspace-maps{grid-template-columns:1fr;gap:28px}}

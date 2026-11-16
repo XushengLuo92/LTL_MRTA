@@ -11,3 +11,5 @@ GitHub Pages serves the repository root from `codex/demo-visual-refresh`. `.noje
 - `demo/generated/`: existing video and replay assets, shared with the README.
 
 Preview from the repository root with `python3 -m http.server 8000`, then open `http://localhost:8000`. No Node, build step, or external CDN is required. When replacing a video, refresh its poster as well.
+
+Regenerate the two workspace maps with `python scripts/export_workspace_maps.py` in the `ltl_mrta` environment. The exporter verifies that Cases 1–8 and Cases 9–10 respectively share a layout and uses the demo renderer to draw regions and obstacles.
