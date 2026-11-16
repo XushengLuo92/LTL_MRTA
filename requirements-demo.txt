@@ -1,0 +1,5 @@
+# Visualization only; no Gurobi, ltl2ba, or solver license required.
+numpy>=1.25,<3
+matplotlib>=3.6,<4
+Pillow>=9
+imageio-ffmpeg>=0.5,<1

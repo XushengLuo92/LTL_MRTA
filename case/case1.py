@@ -15,9 +15,11 @@ from mrta import milp_suf
 import pickle
 from mrta.GMAPP import mapp, compute_path_cost, return_to_initial
 from mrta.vis import vis
+from mrta.replay_export import export_plan
 import os
 from mrta.util import create_parser, print_red_on_cyan
 import numpy as np 
+import random
 
 # Define the path for the 'data' folder
 data_folder_path = './data'
@@ -29,7 +31,11 @@ if not os.path.exists(data_folder_path):
 
 # ---------------------------- LTL-MRTA---------------------------
 parser = create_parser()
+parser.add_argument('--planning-mode', choices=['both', 'sequential', 'simultaneous'],
+                    default='both', help='Select an existing planner mode; simultaneous enables collision avoidance.')
 args = parser.parse_known_args()[0]
+if args.seed is not None:
+    random.seed(args.seed)
     
 workspace = Workspace()
 with open('./data/workspace', 'wb') as filehandle:
@@ -51,7 +57,7 @@ buchi.construct_buchi_graph()
 
 loop = args.loop
 one_time = args.only_first
-draw = args.vis
+draw = args.vis or args.replay_only
 show = args.print
 partial_or_full = args.partial_or_full
 
@@ -59,7 +65,8 @@ collision = {'simultaneous': True, 'sequential': False}
 
 init_acpt = buchi.get_init_accept()
 
-for seqsim in ['sequential', 'simultaneous']:
+planning_modes = ['sequential', 'simultaneous'] if args.planning_mode == 'both' else [args.planning_mode]
+for seqsim in planning_modes:
     best_cost = np.inf
     best_path = dict()
 
@@ -212,8 +219,7 @@ for seqsim in ['sequential', 'simultaneous']:
                                        [pruned_subgraph.number_of_nodes(), pruned_subgraph.number_of_edges()],
                                       'A path is found for the case where the accepting state has a self-loop'])
                 if draw:
-                    vis(args.case, workspace, robot_path_pre, {robot: [len(path)] * 2 for robot, path in robot_path_pre.items()},
-                        [])
+                    export_plan(args, workspace, robot_path_pre, task, id2robots, acpt_run)
                 if one_time:
                     exit()
                 else:
@@ -293,7 +299,7 @@ for seqsim in ['sequential', 'simultaneous']:
                 maximal_element_suf = [node for node in hasse_diagram_suf.nodes()
                                        if hasse_diagram_suf.in_degree(node) == 0]
 
-                robot_waypoint_suf, robot_time_suf, _, robot_label_suf, robot_waypoint_axis_suf, robot_time_axis_suf, \
+                robot_waypoint_suf, robot_time_suf, suffix_bindings, robot_label_suf, robot_waypoint_axis_suf, robot_time_axis_suf, \
                 time_axis_suf, acpt_run_suf \
                     = milp_suf.construct_milp_constraint(ts_suf, workspace.type_num, pos_suf,
                                                                     pruned_subgraph_suf,
@@ -354,7 +360,7 @@ for seqsim in ['sequential', 'simultaneous']:
                         {robot: path[-1] for robot, path in robot_path_suf.items()},
                         workspace.type_robot_location)
 
-                    acpt_run_suf = {'subtask': 'return',
+                    return_stage = {'subtask': 'return',
                                     'time_element': [horizon, -1],
                                     'essential_robot_edge': {label: [type_robot]
                                                              for type_robot, label in
@@ -364,7 +370,7 @@ for seqsim in ['sequential', 'simultaneous']:
                                     'essential_robot_vertex': last_subtask['essential_robot_edge'],
                                     'neg_vertex': last_subtask['neg_edge']
                                     }
-                    robot_path_return = return_to_initial(workspace, acpt_run_suf, {robot: path[-1]
+                    robot_path_return = return_to_initial(workspace, return_stage, {robot: path[-1]
                                                                                     for robot, path in
                                                                                     robot_path_suf.items()}
                                                           )
@@ -382,7 +388,7 @@ for seqsim in ['sequential', 'simultaneous']:
                 if best_cost >= cost:
                     best_path = robot_path
                     best_cost = cost
-                    print(f'{seqsim} + col:{collision[seqsim]} cost of the best pre + suf parts {min(best_cost)}, horizon {len(robot_path_pre[(1, 0)])+len(robot_path_suf[(1, 0)])}')
+                    print(f'{seqsim} + col:{collision[seqsim]} cost of the best pre + suf parts {best_cost}, horizon {len(robot_path_pre[(1, 0)])+len(robot_path_suf[(1, 0)])}')
                 # print('the total cost of the found path is: ', min(best_cost), best_cost)
                 if show:
                     print_red_on_cyan(task.formula)
@@ -392,8 +398,9 @@ for seqsim in ['sequential', 'simultaneous']:
                                          pruned_subgraph_suf.number_of_edges()]),
                                        'A path is found for the case where the accepting state does not have a self-loop'])
                 if draw:
-                    vis(args.case, workspace, robot_path, {robot: [len(path)] * 2 for robot, path in robot_path.items()},
-                        [])
+                    export_plan(args, workspace, robot_path, task, id2robots, acpt_run,
+                                prefix_paths=robot_path_pre, suffix_paths=robot_path_suf, suffix_run=acpt_run_suf,
+                                suffix_bindings=suffix_bindings)
                 if one_time:
                     exit()
 print('')

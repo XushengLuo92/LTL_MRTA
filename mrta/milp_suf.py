@@ -1,6 +1,8 @@
 from gurobipy import *
 from .post_processing import run
 from termcolor import colored, cprint
+import itertools
+import operator
 
 print_red_on_cyan = lambda x: cprint(x, 'blue', 'on_red')
 
